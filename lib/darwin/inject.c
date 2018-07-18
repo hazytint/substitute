@@ -13,7 +13,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-extern const struct dyld_all_image_infos *_dyld_get_all_image_infos();
+const struct dyld_all_image_infos *_dyld_get_all_image_infos() {
+    struct task_dyld_info dyld_info;
+    mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
+    if (task_info(mach_task_self(), TASK_DYLD_INFO, (task_info_t)&dyld_info, &count) == KERN_SUCCESS) {
+        return (struct dyld_all_image_infos *)dyld_info.all_image_info_addr;
+    } else {
+        abort();
+    }
+}
 
 #define DEFINE_STRUCTS
 
